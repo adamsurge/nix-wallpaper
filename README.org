@@ -1,5 +1,10 @@
 #+title: nix-wallpaper
 
+
+Fork of [[https://github.com/lunik1/nix-wallpaper][lunik1/nix-wallpaper]] that includes the
+[[https://github.com/afh/nix-wallpaper/tree/add-offset][add-offset]] changes by @afh, which add
+=logoOffset.{x,y}= options for positioning the Nix logo.
+
 This flake provides a package that generates a wallpaper featuring the Nix
 logo, which can be customised by overriding that package. The following
 properties can be overridden:
@@ -25,9 +30,62 @@ By default, the official logo colors with a white background are used.
 * Example usage
 To generate a wallpaper with the gruvbox-dark preset:
 #+begin_src sh
-nix build --impure --expr '(builtins.getFlake "github:lunik1/nix-wallpaper").packages.${builtins.currentSystem}.default.override { preset = "gruvbox-dark"; }'
+nix build --impure --expr '(builtins.getFlake "github:adamsurge/nix-wallpaper").packages.${builtins.currentSystem}.default.override { preset = "gruvbox-dark"; }'
 #+end_src
 The resulting wallpaper will be in =result/share/wallpapers/nixos-wallpaper.png=.
+
+** Basic flake input
+#+begin_src nix
+# flake.nix
+inputs.nix-wallpaper = {
+  url = "github:adamsurge/nix-wallpaper";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+** Home‑manager module
+This example integrates with Stylix. Here =colorHash.<color>= is a color with a hash string, e.g. ="#1e1e2e"=.
+#+begin_src nix
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}: let
+  colorHash = config.lib.stylix.colors.withHashtag;
+  light = colorHash.base07;
+  accent = colorHash.base0D;
+
+  wallpaper = inputs.nix-wallpaper.packages.${pkgs.system}.default.override {
+    width = 7680;
+    height = 2160;
+    backgroundColor = colorHash.base00;
+
+    logoOffset = {
+      x = -2160;
+      y = 0;
+    };
+
+    logoSize = 80.0;
+
+    logoColors = {
+      color0 = light;
+      color2 = light;
+      color4 = light;
+      color1 = accent;
+      color3 = accent;
+      color5 = accent;
+    };
+  };
+in {
+  home.file."Pictures/Wallpapers" = {
+    source = "${wallpaper}/share/wallpapers";
+    recursive = true;
+  };
+}
+#+end_src
+
+This will generate the wallpaper and place it in =~/Pictures/Wallpapers/nixos-wallpaper.png=.
 
 * Presets
 This repository contains a number of pre-set colorschemes, found in
@@ -36,121 +94,121 @@ priority over colors in a preset.
 ** List of presets
 + albania
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/albania.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/albania.png]]
 + bangladesh
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/bangladesh.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/bangladesh.png]]
 + catppuccin-frappe
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/catppuccin-frappe.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/catppuccin-frappe.png]]
 + catppuccin-frappe-rainbow
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/catppuccin-frappe-rainbow.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/catppuccin-frappe-rainbow.png]]
 + catppuccin-latte
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/catppuccin-latte.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/catppuccin-latte.png]]
 + catppuccin-latte-rainbow
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/catppuccin-latte-rainbow.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/catppuccin-latte-rainbow.png]]
 + catppuccin-macchiato
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/catppuccin-macchiato.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/catppuccin-macchiato.png]]
 + catppuccin-macchiato-rainbow
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/catppuccin-macchiato-rainbow.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/catppuccin-macchiato-rainbow.png]]
 + catppuccin-mocha
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/catppuccin-mocha.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/catppuccin-mocha.png]]
 + catppuccin-mocha-rainbow
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/catppuccin-mocha-rainbow.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/catppuccin-mocha-rainbow.png]]
 + community
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/community.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/community.png]]
 + google
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/google.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/google.png]]
 + gruvbox-dark
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/gruvbox-dark.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/gruvbox-dark.png]]
 + gruvbox-dark-rainbow
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/gruvbox-dark-rainbow.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/gruvbox-dark-rainbow.png]]
 + gruvbox-light
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/gruvbox-light.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/gruvbox-light.png]]
 + gruvbox-light-rainbow
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/gruvbox-light-rainbow.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/gruvbox-light-rainbow.png]]
 + kyrgyzstan
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/kyrgyzstan.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/kyrgyzstan.png]]
 + nisshoki
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/nisshoki.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/nisshoki.png]]
 + nix-emacs
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/nix-emacs.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/nix-emacs.png]]
 + nord-night
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/nord-night.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/nord-night.png]]
 + nord-night-aurora
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/nord-night-aurora.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/nord-night-aurora.png]]
 + nord-snow
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/nord-snow.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/nord-snow.png]]
 + nord-snow-aurora
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/nord-snow-aurora.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/nord-snow-aurora.png]]
 + official
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/official.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/official.png]]
 + old-logo
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/old-logo.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/old-logo.png]]
 + pride
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/pride.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/pride.png]]
 + palau
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/palau.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/palau.png]]
 + solarized-dark
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/solarized-dark.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/solarized-dark.png]]
 + solarized-dark-rainbow
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/solarized-dark-rainbow.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/solarized-dark-rainbow.png]]
 + solarized-light
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/solarized-light.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/solarized-light.png]]
 + solarized-light-rainbow
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/solarized-light-rainbow.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/solarized-light-rainbow.png]]
 + somalia
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/somalia.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/somalia.png]]
 + swiss-cross
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/swiss-cross.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/swiss-cross.png]]
 + taegukgi
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/taegukgi.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/taegukgi.png]]
 + transrights
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/transrights.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/transrights.png]]
 + ubuntu
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/ubuntu.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/ubuntu.png]]
 + ubuntu-2004
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/ubuntu-2004.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/ubuntu-2004.png]]
 + vietnam
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/vietnam.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/vietnam.png]]
 + void
 
-  [[https://media.githubusercontent.com/media/lunik1/nix-wallpaper/assets/void.png]]
+  [[https://media.githubusercontent.com/media/adamsurge/nix-wallpaper/assets/void.png]]
 
 * Credits
 NixOS Logo designed by Tim Cuthbertson
